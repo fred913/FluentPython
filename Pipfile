@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+verify_ssl = true
+name = "pip_conf_index_global"
+
+[packages]
+pyside6 = "*"
+pydantic = "*"
+pyside6-fluent-widgets = "*"
+requests = "*"
+loguru = "*"
+typer = "*"
+
+[dev-packages]
+nuitka = "*"
+zstandard = "*"
+
+[requires]
+python_version = "3.11"
+python_full_version = "3.11.4"
+
+[scripts]
+app = "python -m FluentPython"
+build = "nuitka --onefile --plugin-enable=pyside6 FluentPython"
