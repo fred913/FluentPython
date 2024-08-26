@@ -38,11 +38,10 @@ jobs:
           cache: 'pip'
 
       # Build python script into a stand-alone exe
-      - uses: Nuitka/Nuitka-Action@main
-        with:
-          script-name: FluentPython
-          onefile: true
-          disable-console: true
+      - runs: |
+          pip install pipenv
+          pipenv update -d
+          pipenv run nuitka --standalone --plugin-enable=pyside6 FluentPython
           
       # Uploads artifact
       - name: Upload Artifacts
@@ -50,7 +49,5 @@ jobs:
         with:
           name: ${{ runner.os }} ${{ runner.arch }} Build
           path: |
-            build/*.exe
-            build/*.bin
-            build/*.app/**/*
+            dist/*
             
