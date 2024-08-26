@@ -41,7 +41,7 @@ jobs:
       - run: |
           pip install pipenv
           pipenv update -d
-          pipenv run nuitka --standalone --plugin-enable=pyside6 FluentPython
+          pipenv run nuitka --standalone --plugin-enable=pyside6 --macos-create-app-bundle FluentPython
           
       # Uploads artifact
       - name: Upload Artifacts
