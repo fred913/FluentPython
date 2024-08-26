@@ -33,10 +33,14 @@ class FluentPyVersion:
 
     @property
     def envdir(self):
-        return GlobalConfig.get_environments_dir() / self.hash
+        return _GlobalConfig.get_environments_dir() / self.hash
+
+    @property
+    def py_executable(self):
+        return self.envdir / 'Scripts' / 'python'
 
 
-class GlobalConfig:
+class _GlobalConfig:
 
     @staticmethod
     def user_cfgdir():
@@ -234,3 +238,6 @@ class GlobalConfig:
             )
 
         logger.debug(f"Removed environment {version.name} successfully")
+
+
+CFG = _GlobalConfig()

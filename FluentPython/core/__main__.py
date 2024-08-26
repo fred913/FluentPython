@@ -3,12 +3,12 @@ from pathlib import Path
 from loguru import logger
 from typer import Typer
 
-from FluentPython.core.config import GlobalConfig
+from FluentPython.core.config import _GlobalConfig
 from FluentPython.core.utils import query_interpreter_version
 
 app = Typer()
 
-cfg = GlobalConfig()
+cfg = _GlobalConfig()
 
 
 @app.command("list")
