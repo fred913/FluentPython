@@ -112,7 +112,10 @@ class PageJupyter(QWidget):
             lo.addWidget(jupyterLabBtn)
 
     def start_jupyter_lab(self, ver: FluentPyVersion):
-        cmd = [ver.py_executable, "-m", "pip", "install", "jupyterlab"]
+        cmd = [
+            ver.py_executable, "-m", "pip", "install", "jupyterlab", "--index",
+            "https://pypi.tuna.tsinghua.edu.cn/simple"
+        ]
         logger.debug(f"Running command: {cmd}")
         subprocess.check_output(cmd)
 
