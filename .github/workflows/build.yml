@@ -38,7 +38,7 @@ jobs:
           cache: 'pip'
 
       # Build python script into a stand-alone exe
-      - runs: |
+      - run: |
           pip install pipenv
           pipenv update -d
           pipenv run nuitka --standalone --plugin-enable=pyside6 FluentPython
