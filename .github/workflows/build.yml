@@ -42,7 +42,6 @@ jobs:
         with:
           script-name: FluentPython
           onefile: true
-          enable-plugins: pyside6
           disable-console: true
           
       # Uploads artifact
