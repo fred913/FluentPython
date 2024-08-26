@@ -12,6 +12,10 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
 
   build:
@@ -32,10 +36,6 @@ jobs:
         with:
           python-version: '3.11.4'
           cache: 'pip'
-
-      - run: |
-          python -m pip install --upgrade pipenv
-          pipenv update -d
 
       # Build python script into a stand-alone exe
       - uses: Nuitka/Nuitka-Action@main
