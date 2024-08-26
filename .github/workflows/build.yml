@@ -49,5 +49,7 @@ jobs:
         with:
           name: ${{ runner.os }} ${{ runner.arch }} Build
           path: |
-            dist/*
+            *.dist/*.bin
+            *.dist/*.exe
+            *.app
             
