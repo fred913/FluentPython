@@ -17,7 +17,6 @@ zstandard = "*"
 
 [requires]
 python_version = "3.11"
-python_full_version = "3.11.4"
 
 [scripts]
 app = "python -m FluentPython"
