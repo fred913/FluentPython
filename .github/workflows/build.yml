@@ -41,14 +41,8 @@ jobs:
       - run: |
           pip install pipenv
           pipenv update -d
-          pipenv run nuitka --standalone --plugin-enable=pyside6 --macos-create-app-bundle --assume-yes-for-downloads --windows-icon-from-ico=./icon.ico --macos-app-icon FluentPython
-      
-      - name: Fix executable permissions (macOS)
-        if: ${{ runner.os == 'macOS' }}
-        run: |
-          chmod +x FluentPython.app/Contents/MacOS/*
-
-        
+          pipenv run nuitka --standalone --plugin-enable=pyside6 --macos-create-app-bundle --assume-yes-for-downloads FluentPython
+          
       # Uploads artifact
       - name: Upload Artifacts (Win/Linux)
         uses: actions/upload-artifact@v4
