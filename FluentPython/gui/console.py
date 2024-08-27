@@ -2,37 +2,38 @@ import json
 import os
 import subprocess
 import threading
+import time
 from datetime import datetime
 
 from loguru import logger
-from PySide6.QtCore import QSize, Qt, Signal
+from PySide6.QtCore import QEvent, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QTextCursor
 from PySide6.QtWidgets import QLabel, QPushButton, QTextEdit, QWidget
 from qfluentwidgets import FluentIcon as FIF
-from qfluentwidgets import PushButton
+from qfluentwidgets import InfoBar, InfoBarPosition, PushButton
 
 
 class ConsoleExecutionPage(QWidget):
+    terminalUpdated = Signal(str)
 
-    def __init__(self, cmd: list[str], parent=None):
+    def __init__(self, cmd: list[str], tipbar: str, parent=None):
         super().__init__(parent)
 
         self._parent = parent
-
         self.setObjectName('PythonConsole')
 
         self.text_edit = QTextEdit(self)
         self.text_edit.setFont(QFont('Consolas', 12))
-        # self.text_edit.setStyleSheet("background-color: black; color: white;")
         self.text_edit.setTextColor(QColor(255, 255, 255))
         self.text_edit.setStyleSheet(
             "QTextEdit { background-color: rgb(45, 45, 45); border-radius: 8px; padding: 6px; }"
         )
         self.text_edit.setReadOnly(True)
-
         self.text_edit.setPlainText("[Runner] Not started yet")
 
-        self.status_label = QLabel("State: Idle...", self)
+        self.idle_text = "State: Ready, click 'Start' to run \"" + (
+            tipbar or "<program>").strip() + "\""
+        self.status_label = QLabel(self.idle_text, self)
         self.status_label.setFont(QFont('MiSans', 14))
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignTop
                                        | Qt.AlignmentFlag.AlignLeft)
@@ -40,13 +41,10 @@ class ConsoleExecutionPage(QWidget):
         self.button_start = PushButton(FIF.PLAY, "Start", self)
         self.button_start.clicked.connect(self.start_program)
 
-        self.button_end = PushButton(FIF.PAUSE, "Stop ", self)
+        self.button_end = PushButton(FIF.PAUSE, "Stop", self)
         self.button_end.clicked.connect(self.stop_program)
 
-        self.buttons = [
-            self.button_start,
-            self.button_end,
-        ]
+        self.buttons = [self.button_start, self.button_end]
         for button in self.buttons:
             button.setFont(QFont('MiSans', 10))
 
@@ -54,7 +52,6 @@ class ConsoleExecutionPage(QWidget):
 
         self.child = None
         self.stopping = False
-
         self.cmd = cmd
 
     def updateStatus(self, status: str):
@@ -82,7 +79,6 @@ class ConsoleExecutionPage(QWidget):
         self.reposition()
 
     def start_program(self, event):
-        # run subprocess: python -m pipenv run python adaptive_pipeline.py {config_json}
         self.child = subprocess.Popen(
             self.cmd,
             stderr=subprocess.STDOUT,
@@ -102,13 +98,12 @@ class ConsoleExecutionPage(QWidget):
 
                 self.updateTerminal(line)
 
-                if self.stopping:
-                    self.updateStatus("Stopping...")
-                else:
-                    self.updateStatus("Running...")
+                if not self.stopping:
+                    self.updateStatus("Running")
+
             self.updateTerminal(
                 f"[Runner] Program stopped with code {self.child.returncode}")
-            self.updateStatus("Idle...")
+            self.updateStatus(self.idle_text)
 
             self.child = None
             self.stopping = False
@@ -117,10 +112,33 @@ class ConsoleExecutionPage(QWidget):
 
     def stop_program(self, event):
         if self.child is not None:
-            if not self.stopping:
-                self.stopping = True
-                self.updateTerminal("Stopping program...")
-                self.child.terminate()
+            if self.stopping:
+                InfoBar.warning(title="请稍等片刻",
+                                content="程序已经进入中止中的状态",
+                                orient=Qt.Orientation.Horizontal,
+                                isClosable=True,
+                                position=InfoBarPosition.TOP_RIGHT,
+                                duration=1500,
+                                parent=self.topLevelWidget())
+                return
+
+            self.stopping = True
+            self.updateStatus("Stopping...")
+            self.updateTerminal("Stopping program...")
+            InfoBar.info(
+                title='正在停止程序...',
+                content=
+                "有时 JupyterLab 会无法中止，您可以直接在左侧选择其他 Tab，开启新的 Session。（持续优化中）",
+                orient=Qt.Orientation.Horizontal,
+                isClosable=True,
+                position=InfoBarPosition.TOP_RIGHT,
+                duration=1500,
+                parent=self.topLevelWidget())
+
+            self.child.terminate()
+            time.sleep(0.5)
+            self.child.kill()
+            self.child.wait()
 
     def updateTerminal(self, text: str):
         text = text.rstrip() + '\n'
@@ -129,7 +147,10 @@ class ConsoleExecutionPage(QWidget):
             f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}] {text}")
         self.text_edit.moveCursor(QTextCursor.MoveOperation.End)
 
-        logger.debug(text)
+        # logger.debug(text)
+
+        # Emit the terminalUpdated signal
+        self.terminalUpdated.emit(text)
 
     def __del__(self):
         if self.child is not None:

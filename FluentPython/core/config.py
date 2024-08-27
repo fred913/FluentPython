@@ -124,9 +124,17 @@ class _GlobalConfig:
                 try:
                     ver_config = VersionConfig.model_validate_json(
                         ver_config_file.read_text("utf-8"))
+
                 except json.JSONDecodeError:
                     logger.error(
                         f"Invalid JSON in {ver_config_file}; skipping")
+                    corrupted = True
+                    break
+
+                except FileNotFoundError:
+                    logger.error(
+                        f"Version directory {version_dir} is missing fluentpy.json; skipping"
+                    )
                     corrupted = True
                     break
 
