@@ -177,6 +177,17 @@ class _GlobalConfig:
 
         logger.debug(f"Interpreter version: {interp_ver}")
 
+        # check if virtualenv is installed
+        try:
+            subprocess.check_output(
+                [str(interpreter), "-m", "virtualenv", "--version"])
+        except subprocess.CalledProcessError:
+            # install via pip
+            logger.debug(
+                f"Virtualenv not found; installing virtualenv via pip")
+            subprocess.check_output(
+                [str(interpreter), "-m", "pip", "install", "virtualenv"])
+
         # create venv dir
         namehash = myhash(name)
         venv_dir = self.environments_dir / namehash
