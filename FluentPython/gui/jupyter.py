@@ -254,7 +254,7 @@ class PageJupyter(QWidget):
         cmd = [
             ver.py_executable, "-m", "jupyter", "notebook",
             "--NotebookApp.allow_origin='https://colab.research.google.com'",
-            "--port=8888", "--no-browser"
+            f"--port={port}", "--no-browser"
         ]
         logger.debug(f"Running command: {cmd}")
 
