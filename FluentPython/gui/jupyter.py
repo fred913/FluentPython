@@ -206,19 +206,20 @@ class PageJupyter(QWidget):
         installed = False
         try:
             subprocess.check_output(
-                [ver.py_executable, "-m", "jupyterlab", "--version"])
-            logger.info("JupyterLab is already installed")
+                [ver.py_executable, "-m", "notebook", "--version"])
+            logger.info("JupyterNotebook is already installed")
             installed = True
         except subprocess.CalledProcessError:
             pass
 
         if not installed:
-            w = MessageBox("警告", "JupyterLab 未安装，是否现在安装？（确认后请等候一下，完成后对话框自动关闭）",
-                           self.topLevelWidget())
+            w = MessageBox(
+                "警告", "Jupyter Notebook 未安装，是否现在安装？（确认后请等候一下，完成后对话框自动关闭）",
+                self.topLevelWidget())
 
             if w.exec():
                 InfoBar.info(title='安装中',
-                             content="正在安装 JupyterLab，请等待...",
+                             content="正在安装 JupyterNotebook，请等待...",
                              orient=Qt.Orientation.Horizontal,
                              isClosable=True,
                              position=InfoBarPosition.BOTTOM_LEFT,
@@ -226,22 +227,24 @@ class PageJupyter(QWidget):
                              parent=self.topLevelWidget())
 
                 cmd = [
-                    ver.py_executable, "-m", "pip", "install", "jupyterlab",
-                    "--index", "https://pypi.tuna.tsinghua.edu.cn/simple"
+                    ver.py_executable, "-m", "pip", "install", "notebook",
+                    "jupyterlab", "--index",
+                    "https://pypi.tuna.tsinghua.edu.cn/simple"
                 ]
                 logger.debug(f"Running command: {cmd}")
                 subprocess.check_output(cmd)
 
-                InfoBar.success(title='安装成功',
-                                content="JupyterLab 安装成功",
-                                orient=Qt.Orientation.Horizontal,
-                                isClosable=True,
-                                position=InfoBarPosition.BOTTOM_LEFT,
-                                duration=1500,
-                                parent=self.topLevelWidget())
+                InfoBar.success(
+                    title='安装成功',
+                    content="JupyterNotebook 安装成功，将启动 Jupyter Notebook...",
+                    orient=Qt.Orientation.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.BOTTOM_LEFT,
+                    duration=1500,
+                    parent=self.topLevelWidget())
             else:
                 InfoBar.info(title='已取消',
-                             content="已取消安装，请手动安装 JupyterLab 后再试。",
+                             content="已取消安装，请手动安装 Jupyter Notebook 后再试。",
                              orient=Qt.Orientation.Horizontal,
                              isClosable=True,
                              position=InfoBarPosition.BOTTOM_LEFT,
