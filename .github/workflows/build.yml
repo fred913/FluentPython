@@ -44,11 +44,19 @@ jobs:
           pipenv run nuitka --standalone --plugin-enable=pyside6 --macos-create-app-bundle FluentPython
           
       # Uploads artifact
-      - name: Upload Artifacts
+      - name: Upload Artifacts (Win/Linux)
         uses: actions/upload-artifact@v4
+        if: ${{ runner.os != 'macOS' }}
         with:
           name: ${{ runner.os }} ${{ runner.arch }} Build
           path: |
             FluentPython.dist
+
+      - name: Upload Artifacts (macOS)
+        uses: actions/upload-artifact@v4
+        if: ${{ runner.os == 'macOS' }}
+        with:
+          name: ${{ runner.os }} ${{ runner.arch }} Build
+          path: |
             FluentPython.app
 
