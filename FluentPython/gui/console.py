@@ -31,7 +31,7 @@ class ConsoleExecutionPage(QWidget):
         self.text_edit.setReadOnly(True)
         self.text_edit.setPlainText("[Runner] Not started yet")
 
-        self.idle_text = "State: Ready, click 'Start' to run \"" + (
+        self.idle_text = "Ready, click 'Start' to run \"" + (
             tipbar or "<program>").strip() + "\""
         self.status_label = QLabel(self.idle_text, self)
         self.status_label.setFont(QFont('MiSans', 14))
@@ -55,7 +55,7 @@ class ConsoleExecutionPage(QWidget):
         self.cmd = cmd
 
     def updateStatus(self, status: str):
-        self.status_label.setText(f"State: {status}")
+        self.status_label.setText(f"State: {status.strip()}")
 
     def reposition(self):
         sz = self.size()
