@@ -126,8 +126,19 @@ class _GlobalConfig:
         res = []
         for verdirname in self._list_version_dirs():
             corrupted = False
+            # check name legallity: 0-9a-f only
+            if not all(c in "0123456789abcdef" for c in verdirname):
+                logger.warning(
+                    f"Version directory {verdirname} contains non-hex characters; skipping"
+                )
+                continue
+            version_dir = self.environments_dir / verdirname
+            if not version_dir.is_dir():
+                logger.warning(
+                    f"Version directory {version_dir} is not a directory; skipping"
+                )
+                continue
             while True:
-                version_dir = self.environments_dir / verdirname
                 ver_config_file = version_dir / 'fluentpy.json'
                 try:
                     ver_config = VersionConfig.model_validate_json(
