@@ -50,4 +50,5 @@ jobs:
           name: ${{ runner.os }} ${{ runner.arch }} Build
           path: |
             FluentPython.dist
-            
+            FluentPython.app
+
