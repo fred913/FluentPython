@@ -5,6 +5,7 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
+from genericpath import isfile
 from loguru import logger
 from pydantic import BaseModel
 
@@ -37,7 +38,14 @@ class FluentPyVersion:
 
     @property
     def py_executable(self):
-        return self.envdir / 'Scripts' / 'python'
+        res = self.envdir / 'Scripts' / 'python'
+
+        if res.exists():
+            return res
+
+        res = self.envdir / 'bin' / 'python'
+        assert res.exists()
+        return res
 
 
 class _GlobalConfig:
